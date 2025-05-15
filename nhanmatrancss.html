@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Luyện tập nhân ma trận</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      color: #333;
+      max-width: 900px;
+      margin: auto;
+      padding: 30px;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    .matrix-title {
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 25px;
+      color: #2c3e50;
+    }
+    .matrix {
+      margin-bottom: 20px;
+    }
+    input[type="number"] {
+      width: 50px;
+      padding: 6px;
+      margin: 2px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      text-align: center;
+      transition: background-color 0.3s ease;
+    }
+    input[type="number"]:disabled {
+      background-color: #ecf0f1;
+      font-weight: bold;
+    }
+    button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 15px;
+      border: none;
+      border-radius: 8px;
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    .correct {
+      background-color: #c8f7c5 !important;
+    }
+    .wrong {
+      background-color: #f9c0c0 !important;
+    }
+    #feedback {
+      font-size: 18px;
+      padding: 10px;
+      text-align: center;
+    }
+    #feedback.correct {
+      color: green;
+    }
+    #feedback.wrong {
+      color: red;
+    }
+    #timer {
+      font-size: 16px;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Luyện tập nhân hai ma trận</h1>
+
+  <p>🎯 Nhập kích thước để tạo bài luyện tập ngẫu nhiên:</p>
+  <p>
+    Ma trận A: Dòng (m) <input type="number" id="rowsA" value="2" min="1">
+    Cột (n) <input type="number" id="colsA" value="3" min="1">
+    &nbsp;&nbsp;
+    Ma trận B: Cột (p) <input type="number" id="colsB" value="2" min="1">
+  </p>
+  <p>
+    <button onclick="generateExercise()">Tạo bài luyện tập</button>
+    <span id="timer">⏱️ Thời gian: 0 giây</span>
+  </p>
+
+  <div class="matrix-title">🅰️ Ma trận A</div>
+  <div id="matrixA" class="matrix"></div>
+
+  <div class="matrix-title">🅱️ Ma trận B</div>
+  <div id="matrixB" class="matrix"></div>
+
+  <div class="matrix-title">🧮 Nhập kết quả C = A × B</div>
+  <div id="matrixCInput" class="matrix"></div>
+
+  <button onclick="checkResult()">🔍 Kiểm tra</button>
+  <button onclick="showAnswer()">📢 Hiển thị đáp án</button>
+  <button onclick="generateExercise()">🔁 Bài luyện tập mới</button>
+
+  <div id="matrixCAnswer" class="matrix-title"></div>
+  <div id="feedback"></div>
+
+  <script>
+    let A = [], B = [], C = [], m = 0, n = 0, p = 0;
+    let timer = 0, timerInterval;
+
+    function generateRandomMatrix(rows, cols) {
+      const matrix = [];
+      for (let i = 0; i < rows; i++) {
+        matrix[i] = [];
+        for (let j = 0; j < cols; j++) {
+          matrix[i][j] = Math.floor(Math.random() * 9) + 1;
+        }
+      }
+      return matrix;
+    }
+
+    function displayMatrix(matrix, containerId, disabled = true) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      for (let i = 0; i < matrix.length; i++) {
+        for (let j = 0; j < matrix[0].length; j++) {
+          const input = document.createElement('input');
+          input.type = 'number';
+          input.value = matrix[i][j];
+          input.disabled = disabled;
+          container.appendChild(input);
+        }
+        container.appendChild(document.createElement('br'));
+      }
+    }
+
+    function generateInputMatrix(rows, cols, containerId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          const input = document.createElement('input');
+          input.type = 'number';
+          input.id = `c-${i}-${j}`;
+          input.placeholder = '?';
+          container.appendChild(input);
+        }
+        container.appendChild(document.createElement('br'));
+      }
+    }
+
+    function multiply(A, B) {
+      const m = A.length;
+      const n = A[0].length;
+      const p = B[0].length;
+      const C = [];
+
+      for (let i = 0; i < m; i++) {
+        C[i] = [];
+        for (let j = 0; j < p; j++) {
+          let sum = 0;
+          for (let k = 0; k < n; k++) {
+            sum += A[i][k] * B[k][j];
+          }
+          C[i][j] = sum;
+        }
+      }
+      return C;
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      timer = 0;
+      document.getElementById("timer").textContent = "⏱️ Thời gian: 0 giây";
+      timerInterval = setInterval(() => {
+        timer++;
+        document.getElementById("timer").textContent = `⏱️ Thời gian: ${timer} giây`;
+      }, 1000);
+    }
+
+    function generateExercise() {
+      m = parseInt(document.getElementById('rowsA').value);
+      n = parseInt(document.getElementById('colsA').value);
+      p = parseInt(document.getElementById('colsB').value);
+
+      if (m <= 0 || n <= 0 || p <= 0) {
+        alert("Kích thước ma trận phải lớn hơn 0.");
+        return;
+      }
+
+      A = generateRandomMatrix(m, n);
+      B = generateRandomMatrix(n, p);
+      C = multiply(A, B);
+
+      displayMatrix(A, 'matrixA');
+      displayMatrix(B, 'matrixB');
+      generateInputMatrix(m, p, 'matrixCInput');
+
+      document.getElementById('feedback').innerHTML = '';
+      document.getElementById('feedback').className = '';
+      document.getElementById('matrixCAnswer').innerHTML = '';
+      startTimer();
+    }
+
+    function checkResult() {
+      clearInterval(timerInterval);
+      let allCorrect = true;
+      for (let i = 0; i < m; i++) {
+        for (let j = 0; j < p; j++) {
+          const input = document.getElementById(`c-${i}-${j}`);
+          const userValue = parseFloat(input.value);
+          if (userValue === C[i][j]) {
+            input.classList.remove('wrong');
+            input.classList.add('correct');
+          } else {
+            input.classList.remove('correct');
+            input.classList.add('wrong');
+            allCorrect = false;
+          }
+        }
+      }
+
+      const feedback = document.getElementById('feedback');
+      feedback.textContent = allCorrect
+        ? `🎉 Chính xác! Bạn đã hoàn thành trong ${timer} giây!`
+        : `❌ Có chỗ sai! Thời gian làm: ${timer} giây`;
+      feedback.className = allCorrect ? 'correct' : 'wrong';
+    }
+
+    function showAnswer() {
+      const container = document.getElementById('matrixCAnswer');
+      container.innerHTML = '🟩 Đáp án đúng:';
+      const matrix = C;
+      for (let i = 0; i < matrix.length; i++) {
+        for (let j = 0; j < matrix[0].length; j++) {
+          const input = document.createElement('input');
+          input.type = 'number';
+          input.value = matrix[i][j];
+          input.disabled = true;
+          container.appendChild(input);
+        }
+        container.appendChild(document.createElement('br'));
+      }
+    }
+  </script>
+</body>
+</html>
