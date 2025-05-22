@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Matrix Practice Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to bottom right, #ede9fe, #f0f9ff, #ffffff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.5rem;
+      color: #1f2937;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #4b5563;
+      margin-bottom: 30px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    li {
+      margin-bottom: 16px;
+    }
+    .card-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-decoration: none;
+      background: white;
+      border-radius: 1rem;
+      padding: 16px 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      color: #111827;
+      font-weight: 500;
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
+    .card-link:hover {
+      transform: scale(1.03);
+      background: #f9fafb;
+    }
+    .arrow {
+      font-size: 1rem;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Matrix Practice Hub</h1>
+    <p>Chọn một công cụ để luyện tập các khái niệm liên quan đến ma trận.</p>
+    <ul>
+      <li>
+        <a class="card-link" href="luyentapnhanmatran.html">
+          Luyện tập nhân ma trận <span class="arrow">→</span>
+        </a>
+      </li>
+      <li>
+        <a class="card-link" href="matrannghichdaodinhthuc.html">
+          Ma trận nghịch đảo & Định thức <span class="arrow">→</span>
+        </a>
+      </li>
+      <li>
+        <a class="card-link" href="minor_va_cofactor.html">
+          Minor và Cofactor <span class="arrow">→</span>
+        </a>
+      </li>
+      <!-- Bạn có thể thêm nhiều mục tại đây -->
+      <!-- Ví dụ:
+      <li>
+        <a class="card-link" href="duongcheomatran.html">
+          Đường chéo của ma trận <span class="arrow">→</span>
+        </a>
+      </li>
+      -->
+    </ul>
+  </div>
+</body>
+</html>
