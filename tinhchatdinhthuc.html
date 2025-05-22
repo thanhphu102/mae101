@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Quiz</title>
+    <link href="./styles.css" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+        }
+        #emailModal {
+            display: none;
+        }
+        .btn-option {
+            width: 120px;
+            background-color: #4a6baf;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-right: 10px;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-option:hover {
+            background-color: #3a5a9f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .btn-correct {
+            background-color: #28a745;
+        }
+        .btn-correct:hover {
+            background-color: #218838;
+        }
+        .btn-incorrect {
+            background-color: #dc3545;
+        }
+        .btn-incorrect:hover {
+            background-color: #c82333;
+        }
+        .btn-option:disabled {
+            opacity: 1;
+            cursor: default;
+        }
+        .btn-start {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-start:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .btn-back {
+            background-color: #ffc107;
+            color: #212529;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-back:hover {
+            background-color: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .btn-next {
+            background-color: #17a2b8;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-next:hover {
+            background-color: #138496;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .btn-finish {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-finish:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .btn-certificate {
+            background-color: #17a2b8;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        .btn-certificate:hover {
+            background-color: #138496;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .btn-download {
+            background-color: #17a2b8;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-left: 10px;
+        }
+        .btn-download:hover {
+            background-color: #138496;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .certificate-container {
+            background-color: #ffffff;
+            border: 4px double #4CAF50;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .certificate-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 10px solid #f1f8e9;
+            pointer-events: none;
+        }
+        #timer-box {
+            background-color: #28a745;
+            color: white;
+            font-size: 18px;
+            width: 300px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            font-weight: bold;
+            margin: 0 auto 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        #quizContainer {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 28px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        #questionText {
+            font-size: 18px;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #17a2b8;
+        }
+        #options {
+            margin-bottom: 25px;
+        }
+        .option-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .formula-container {
+            margin-left: 20px;
+            flex-grow: 1;
+        }
+        #feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            background-color: #e9ecef;
+            border-left: 4px solid #ffc107;
+        }
+        #navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        #resultScreen {
+            text-align: center;
+        }
+        #resultSummary {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        #resultDetails {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        #emailModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .mjx-chtml {
+            display: inline-block;
+            line-height: 1.2;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div id="quizContainer">
+        <h1>Tính Định thức Ma trận bằng Tính chất</h1>
+        <div id="introScreen" class="space-y-4">
+            <p class="text-center" style="font-size: 18px; color: #555;">Vui lòng nhập thông tin sinh viên để bắt đầu:</p>
+            <input id="studentName" type="text" placeholder="Họ tên" class="w-full p-2 border rounded">
+            <input id="studentId" type="text" placeholder="MSSV" class="w-full p-2 border rounded">
+            <button id="startQuizButton" class="w-full btn-start">Bắt đầu bài thi</button>
+        </div>
+        <div id="quizScreen" class="hidden">
+            <div id="timer-box">0</div>
+            <div id="questionText" class="mb-4"></div>
+            <div id="options" class="space-y-4"></div>
+            <div id="feedback" class="mt-4"></div>
+            <div id="navigation" class="mt-4 flex justify-between">
+                <button onclick="goBack()" class="btn-back">Back</button>
+                <button onclick="goNext()" class="btn-next">Next</button>
+                <button onclick="finishQuiz()" class="btn-finish">Finish</button>
+            </div>
+        </div>
+        <div id="resultScreen" class="hidden">
+            <h2 id="resultSummary" class="text-xl font-bold"></h2>
+            <div id="resultDetails" class="mt-4"></div>
+            <button onclick="showEmailContent()" class="btn-certificate">Chứng nhận</button>
+        </div>
+    </div>
+    <div id="emailModal">
+        <div class="modal-content">
+            <div id="emailContent"></div>
+            <div class="modal-actions">
+                <button onclick="closeEmailModal()" class="btn-back">Close</button>
+                <button onclick="downloadPDF()" class="btn-download">Download PDF</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Check for file:// context
+        if (window.location.protocol === 'file:') {
+            console.warn('Chạy ở chế độ file://. Các liên kết bên ngoài có thể không hoạt động do hạn chế bảo mật trình duyệt. Vui lòng chạy trên server cục bộ (ví dụ: http://localhost) bằng `http-server`.');
+        }
+
+        // State variables
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let studentName = '';
+        let studentId = '';
+        let seconds = 0;
+        let timerInterval = null;
+        let timerRunning = false;
+        const questions = [
+            {
+                text: "\\text{Câu 1. Cho ma trận } A = \\begin{bmatrix} a & b & c \\\\ p & q & r \\\\ x & y & z \\end{bmatrix} \\text{ với } \\det(A) = \\delta. \\text{ Tìm } \\det(B) \\text{ với } B = \\begin{bmatrix} a + 2x & b + 2y & c + 2z \\\\ 3a - p & 3b - q & 3c - r \\\\ a & b & c \\end{bmatrix}.",
+                correct_answer: "C",
+                options: ['A', 'B', 'C', 'D'],
+                formulas: [
+                    "\\det(B) = \\delta",
+                    "\\det(B) = 3 \\cdot \\delta",
+                    "\\det(B) = 2 \\cdot \\delta",
+                    "\\det(B) = 4 \\cdot \\delta"
+                ],
+                explanation_links: ["https://byvn.net/bw30", "https://byvn.net/bw30"]
+            },
+            {
+                text: "\\text{Câu 2. Cho ma trận } A = \\begin{bmatrix} a & b & c \\\\ d & e & f \\\\ g & h & i \\end{bmatrix} \\text{ với } \\det(A) = \\delta. \\text{ Tìm } \\det(B) \\text{ với } B = \\begin{bmatrix} a & b & c \\\\ d + 3a & e + 3b & f + 3c \\\\ g & h & i \\end{bmatrix}.",
+                correct_answer: "A",
+                options: ['A', 'B', 'C', 'D'],
+                formulas: [
+                    "\\det(B) = \\delta",
+                    "\\det(B) = 3 \\cdot \\delta",
+                    "\\det(B) = 2 \\cdot \\delta",
+                    "\\det(B) = 4 \\cdot \\delta"
+                ],
+                explanation_links: ["https://byvn.net/bw30", "https://byvn.net/bw30"]
+            },
+            {
+                text: "\\text{Câu 3. Cho ma trận } A = \\begin{bmatrix} a & b & c \\\\ d & e & f \\\\ g & h & i \\end{bmatrix} \\text{ với } \\det(A) = \\delta. \\text{ Tìm } \\det(B) \\text{ với } B = \\begin{bmatrix} a & b + 2a & c \\\\ d & e + 2d & f \\\\ g & h + 2g & i \\end{bmatrix}.",
+                correct_answer: "A",
+                options: ['A', 'B', 'C', 'D'],
+                formulas: [
+                    "\\det(B) = \\delta",
+                    "\\det(B) = 2 \\cdot \\delta",
+                    "\\det(B) = 3 \\cdot \\delta",
+                    "\\det(B) = 4 \\cdot \\delta"
+                ],
+                explanation_links: ["https://byvn.net/bw30", "https://byvn.net/bw30"]
+            },
+            {
+                text: "\\text{Câu 4. Cho ma trận } A = \\begin{bmatrix} a & b & c \\\\ d & e & f \\\\ g & h & i \\end{bmatrix} \\text{ với } \\det(A) = \\delta. \\text{ Tìm } \\det(B) \\text{ với } B = \\begin{bmatrix} a & b & c + 5a \\\\ d & e & f + 5d \\\\ g & h & i + 5g \\end{bmatrix}.",
+                correct_answer: "A",
+                options: ['A', 'B', 'C', 'D'],
+                formulas: [
+                    "\\det(B) = \\delta",
+                    "\\det(B) = 5 \\cdot \\delta",
+                    "\\det(B) = 10 \\cdot \\delta",
+                    "\\det(B) = 25 \\cdot \\delta"
+                ],
+                explanation_links: ["https://byvn.net/bw30", "https://byvn.net/bw30"]
+            },
+            {
+                text: "\\text{Câu 5. Cho ma trận } A = \\begin{bmatrix} a & b & c \\\\ d & e & f \\\\ g & h & i \\end{bmatrix} \\text{ với } \\det(A) = \\delta. \\text{ Tìm } \\det(B) \\text{ với } B = \\begin{bmatrix} a + 4d & b + 4e & c + 4f \\\\ d & e & f \\\\ g & h & i \\end{bmatrix}.",
+                correct_answer: "A",
+                options: ['A', 'B', 'C', 'D'],
+                formulas: [
+                    "\\det(B) = \\delta",
+                    "\\det(B) = 4 \\cdot \\delta",
+                    "\\det(B) = 8 \\cdot \\delta",
+                    "\\det(B) = 16 \\cdot \\delta"
+                ],
+                explanation_links: ["https://byvn.net/bw30", "https://byvn.net/bw30"]
+            }
+        ];
+        const totalQuestions = questions.length;
+
+        // Navigation functions in global scope
+        function goBack() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        function goNext() {
+            if (currentQuestionIndex < totalQuestions - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        }
+
+        function finishQuiz() {
+            if (timerRunning) {
+                clearInterval(timerInterval);
+                timerRunning = false;
+                document.getElementById('timer-box').textContent = `Đã Hoàn thành trong: ${seconds} giây`;
+            }
+            const percentage = (score / totalQuestions) * 100;
+            const grade = ((score / totalQuestions) * 10).toFixed(1);
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+            document.getElementById('resultSummary').textContent = `Quiz completed! Your score: ${score}/${totalQuestions}`;
+            document.getElementById('resultDetails').innerHTML = `
+                <p style="font-size: 18px; margin-bottom: 10px;">Percentage: <span style="font-weight: bold; color: #28a745;">${percentage}%</span></p>
+                <p style="font-size: 18px; margin-bottom: 10px;">Grade: <span style="font-weight: bold; color: #17a2b8;">${grade}/10</span></p>
+                <p style="font-size: 18px;">Bạn đã làm bài thi này trong thời gian: <span style="font-weight: bold; color: #6c757d;">${seconds} giây</span></p>
+            `;
+        }
+
+        // Other functions
+        function startQuiz() {
+            studentName = document.getElementById('studentName').value.trim();
+            studentId = document.getElementById('studentId').value.trim();
+            if (!studentName || !studentId) {
+                alert('Vui lòng nhập đầy đủ Họ tên và Mã số sinh viên!');
+                return;
+            }
+            document.getElementById('introScreen').classList.add('hidden');
+            document.getElementById('quizScreen').classList.remove('hidden');
+            seconds = 0;
+            timerRunning = true;
+            document.getElementById('timer-box').textContent = seconds;
+            timerInterval = setInterval(() => {
+                if (timerRunning) {
+                    seconds++;
+                    document.getElementById('timer-box').textContent = seconds;
+                }
+            }, 1000);
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            const question = questions[currentQuestionIndex];
+            document.getElementById('questionText').innerHTML = `\\(${question.text}\\)`; // Render LaTeX
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionRow = document.createElement('div');
+                optionRow.className = 'option-row';
+                
+                const button = document.createElement('button');
+                button.className = 'btn-option';
+                button.textContent = option;
+                button.onclick = () => checkAnswer(option, button);
+                optionRow.appendChild(button);
+                
+                const formulaDiv = document.createElement('div');
+                formulaDiv.className = 'formula-container';
+                formulaDiv.innerHTML = `\\(${question.formulas[index]}\\)`;
+                optionRow.appendChild(formulaDiv);
+                
+                optionsDiv.appendChild(optionRow);
+            });
+            
+            document.getElementById('feedback').innerHTML = '';
+            MathJax.typeset(); // Re-render MathJax after updating content
+        }
+
+        function checkAnswer(selectedOption, button) {
+            const question = questions[currentQuestionIndex];
+            const correct = selectedOption === question.correct_answer;
+            const linkIndex = correct ? 1 : 0;
+            if (correct) score++;
+            const explanationLink = question.explanation_links[linkIndex];
+            console.log(`Rendering link for question ${currentQuestionIndex + 1}: ${explanationLink}`);
+            if (!explanationLink.startsWith('http://') && !explanationLink.startsWith('https://')) {
+                console.warn(`Invalid URL for question ${currentQuestionIndex + 1}: ${explanationLink}`);
+            }
+            const feedbackDiv = document.getElementById('feedback');
+            const feedbackMessage = correct
+                ? `<p style="color: #28a745; font-weight: bold;">✓ Chúc mừng bạn đã chọn phương án đúng là phương án ${selectedOption}.</p><p>Giải thích ở link: <a href="https://byvn.net/bw30" target="_blank" style="color: #17a2b8;">https://byvn.net/bw30</a></p>`
+                : `<p style="color: #dc3545; font-weight: bold;">✗ Bạn chọn ${selectedOption} là sai, Lựa chọn đúng là ${question.correct_answer}.</p><p>Giải thích ở link: <a href="https://byvn.net/bw30" target="_blank" style="color: #17a2b8;">https://byvn.net/bw30</a></p>`;
+            feedbackDiv.innerHTML = feedbackMessage;
+
+            // Update button colors
+            const buttons = document.querySelectorAll('#options button');
+            buttons.forEach(btn => {
+                if (btn.textContent === question.correct_answer) {
+                    btn.className = 'btn-option btn-correct';
+                } else if (btn === button) {
+                    btn.className = 'btn-option btn-incorrect';
+                } else {
+                    btn.className = 'btn-option';
+                }
+                btn.disabled = true; // Disable buttons after selection
+            });
+        }
+
+        function showEmailContent() {
+            const percentage = (score / totalQuestions) * 100;
+            const grade = ((score / totalQuestions) * 10).toFixed(1);
+            const emailContent = `
+                <div class="certificate-container" id="certificate">
+                    <div style="text-align: center; font-size: 30px; color: #9e1818; font-weight: bold; margin-bottom: 20px;">
+                        CHỨNG NHẬN HOÀN THÀNH
+                    </div>
+                    <div style="text-align: center; font-size: 24px; color: #333; margin-bottom: 20px;">
+                        Tính Định thức Ma trận bằng Tính chất
+                    </div>
+                    <div style="margin: 20px 0; font-size: 16px; color: #555;">
+                        <div style="padding: 20px; border: 1px solid #4CAF50; border-radius: 8px; background-color: #e8f5e9; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-bottom: 20px;">
+                            <p><strong>Họ và Tên:</strong> <span style="font-size: 18px; font-weight: bold; color: #4CAF50; background-color: #f1f8e9; padding: 5px 10px; border-radius: 4px;">${studentName}</span></p>
+                            <p><strong>Mã Số Sinh Viên:</strong> <span style="font-size: 18px; font-weight: bold; color: #4CAF50; background-color: #f1f8e9; padding: 5px 10px; border-radius: 4px;">${studentId}</span></p>
+                        </div>
+                        <div style="padding: 20px; border: 1px solid #4CAF50; border-radius: 8px; background-color: #e8f5e9; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); margin-bottom: 20px;">
+                            <p>Điểm số: <span style="font-size: 20px; font-weight: bold; color: #ff6347;">${grade}/10</span></p>
+                            <p>Tỷ lệ hoàn thành: <span style="font-size: 20px; font-weight: bold; color: #32cd32;">${percentage}%</span></p>
+                        </div>
+                        <div style="padding: 20px; border: 1px solid #4CAF50; border-radius: 8px; background-color: #e8f5e9; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                            <p>Bạn đã làm bài thi này trong thời gian: <span style="font-size: 18px; font-weight: bold; color: #555;">${seconds} giây</span></p>
+                        </div>
+                    </div>
+                    <div style="margin-top: 30px; font-size: 14px; text-align: center; color: #777;">
+                        Được cấp bởi,<br>Quiz Organizer<br>
+                        Ngày cấp: ${new Date().toLocaleDateString('vi-VN')}
+                    </div>
+                </div>
+            `;
+            document.getElementById('emailContent').innerHTML = emailContent;
+            document.getElementById('emailModal').style.display = 'flex';
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('certificate');
+            const opt = {
+                margin: 0.5,
+                filename: 'Certificate.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function closeEmailModal() {
+            document.getElementById('emailModal').style.display = 'none';
+        }
+
+        // Initialize event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('startQuizButton').addEventListener('click', startQuiz);
+        });
+    </script>
+</body>
+</html>
