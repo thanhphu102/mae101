@@ -1,85 +1,385 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Matrix Tool: Minor, Cofactor, Adjugate, Determinant & Inverse</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Máy Tính Ma Trận - Phân Số</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 30px;
-      background: #f4f4f4;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
     h1 {
       text-align: center;
+      color: white;
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .control-panel {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .input-group {
+      display: inline-block;
+      margin: 10px 15px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
       color: #333;
     }
+
+    input[type='number'] {
+      padding: 12px 16px;
+      border: 2px solid #e1e5e9;
+      border-radius: 10px;
+      font-size: 16px;
+      text-align: center;
+      transition: all 0.3s ease;
+      width: 80px;
+    }
+
+    input[type='number']:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 5px;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
     .matrix-input {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
-      gap: 5px;
-      margin-bottom: 20px;
-      max-width: 300px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    input[type='number'], select {
-      width: 100%;
-      padding: 8px;
-      text-align: center;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin: 5px;
-      cursor: pointer;
-    }
-    .output {
-      max-width: 700px;
+      gap: 8px;
       margin: 20px auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      justify-content: center;
+      max-width: fit-content;
     }
+
+    .matrix-input input {
+      width: 60px;
+      height: 60px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .output {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .result-section {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      border-left: 5px solid #667eea;
+    }
+
+    .result-section h3 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 1.3rem;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 10px;
+    }
+
     .matrix {
       display: inline-grid;
-      grid-template-columns: repeat(auto-fit, 50px);
       gap: 4px;
+      margin: 15px 0;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      border: 2px solid #e9ecef;
     }
-    .matrix div {
-      background: #e0e0e0;
+
+    .matrix-cell {
+      background: white;
       text-align: center;
-      padding: 10px;
+      padding: 12px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      color: #333;
+      border: 1px solid #dee2e6;
+      min-width: 60px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .matrix-brackets {
+      position: relative;
+      display: inline-block;
+    }
+
+    .matrix-brackets::before,
+    .matrix-brackets::after {
+      content: '';
+      position: absolute;
+      top: -5px;
+      bottom: -5px;
+      width: 8px;
+      border: 2px solid #333;
+    }
+
+    .matrix-brackets::before {
+      left: -10px;
+      border-right: none;
+      border-radius: 8px 0 0 8px;
+    }
+
+    .matrix-brackets::after {
+      right: -10px;
+      border-left: none;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .determinant-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #667eea;
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #f8f9ff 0%, #e8ecff 100%);
+      border-radius: 10px;
+      margin: 15px 0;
+    }
+
+    .error {
+      color: #dc3545;
+      font-weight: bold;
+      text-align: center;
+      padding: 15px;
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      border-radius: 10px;
+    }
+
+    .fraction {
+      display: inline-block;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .fraction .numerator {
+      display: block;
+      border-bottom: 1px solid #333;
+      padding-bottom: 2px;
+    }
+
+    .fraction .denominator {
+      display: block;
+      padding-top: 2px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .card {
+        padding: 20px;
+      }
+      
+      .output {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Matrix Calculator</h1>
-  <div style="text-align:center">
-    <label>Size: <input type="number" id="size" value="3" min="2" max="5" /></label>
-    <button onclick="generateMatrix()">Generate Matrix</button>
-  </div>
-  <div id="matrixContainer" class="matrix-input"></div>
-  <div style="text-align:center">
-    <label>Row: <input type="number" id="row" value="1" min="1" /></label>
-    <label>Column: <input type="number" id="col" value="1" min="1" /></label>
-    <button onclick="computeSelected()">Compute</button>
-  </div>
-  <div id="output" class="output"></div>
+  <div class="container">
+    <h1>🔢 Máy Tính Ma Trận</h1>
+    
+    <div class="card">
+      <div class="control-panel">
+        <div class="input-group">
+          <label>Kích thước ma trận:</label>
+          <input type="number" id="size" value="3" min="2" max="5" />
+        </div>
+        <button class="btn" onclick="generateMatrix()">🔄 Tạo Ma Trận</button>
+      </div>
+      
+      <div id="matrixContainer" class="matrix-input"></div>
+      
+      <div class="control-panel">
+        <div class="input-group">
+          <label>Hàng:</label>
+          <input type="number" id="row" value="1" min="1" />
+        </div>
+        <div class="input-group">
+          <label>Cột:</label>
+          <input type="number" id="col" value="1" min="1" />
+        </div>
+        <button class="btn" onclick="computeSelected()">⚡ Tính Toán</button>
+      </div>
+    </div>
 
+    <div id="output" class="output"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fraction.js/4.3.7/fraction.min.js"></script>
   <script>
+    // Simple Fraction class for handling fractions
+    class SimpleFraction {
+      constructor(numerator, denominator = 1) {
+        if (typeof numerator === 'string') {
+          const parts = numerator.split('/');
+          this.n = parseInt(parts[0]) || 0;
+          this.d = parseInt(parts[1]) || 1;
+        } else {
+          this.n = numerator;
+          this.d = denominator;
+        }
+        this.simplify();
+      }
+
+      // Greatest Common Divisor
+      gcd(a, b) {
+        a = Math.abs(a);
+        b = Math.abs(b);
+        while (b !== 0) {
+          let temp = b;
+          b = a % b;
+          a = temp;
+        }
+        return a;
+      }
+
+      // Simplify fraction to lowest terms
+      simplify() {
+        if (this.d === 0) throw new Error("Denominator cannot be zero");
+        if (this.n === 0) {
+          this.d = 1;
+          return this;
+        }
+        
+        const gcd = this.gcd(this.n, this.d);
+        this.n = this.n / gcd;
+        this.d = this.d / gcd;
+        
+        // Ensure denominator is positive
+        if (this.d < 0) {
+          this.n = -this.n;
+          this.d = -this.d;
+        }
+        return this;
+      }
+
+      add(other) {
+        if (typeof other === 'number') other = new SimpleFraction(other);
+        const newN = this.n * other.d + other.n * this.d;
+        const newD = this.d * other.d;
+        return new SimpleFraction(newN, newD);
+      }
+
+      sub(other) {
+        if (typeof other === 'number') other = new SimpleFraction(other);
+        const newN = this.n * other.d - other.n * this.d;
+        const newD = this.d * other.d;
+        return new SimpleFraction(newN, newD);
+      }
+
+      mul(other) {
+        if (typeof other === 'number') other = new SimpleFraction(other);
+        return new SimpleFraction(this.n * other.n, this.d * other.d);
+      }
+
+      div(other) {
+        if (typeof other === 'number') other = new SimpleFraction(other);
+        return new SimpleFraction(this.n * other.d, this.d * other.n);
+      }
+
+      neg() {
+        return new SimpleFraction(-this.n, this.d);
+      }
+
+      equals(other) {
+        if (typeof other === 'number') other = new SimpleFraction(other);
+        return this.n * other.d === other.n * this.d;
+      }
+
+      toString() {
+        if (this.d === 1) return this.n.toString();
+        return `${this.n}/${this.d}`;
+      }
+    }
+
     function generateMatrix() {
       const size = parseInt(document.getElementById('size').value);
       const container = document.getElementById('matrixContainer');
       container.innerHTML = '';
-      container.style.gridTemplateColumns = `repeat(${size}, 50px)`;
+      container.style.gridTemplateColumns = `repeat(${size}, 60px)`;
+      
       for (let i = 0; i < size * size; i++) {
         const input = document.createElement('input');
         input.type = 'number';
         input.id = `cell-${i}`;
-        input.value = 0;
+        input.value = Math.floor(Math.random() * 10) + 1; // Random values 1-10
+        input.step = 'any';
         container.appendChild(input);
       }
+      
+      // Update row/col max values
+      document.getElementById('row').max = size;
+      document.getElementById('col').max = size;
     }
 
     function getMatrix(size) {
@@ -87,8 +387,8 @@
       for (let i = 0; i < size; i++) {
         const row = [];
         for (let j = 0; j < size; j++) {
-          const val = parseFloat(document.getElementById(`cell-${i * size + j}`).value);
-          row.push(val);
+          const val = parseFloat(document.getElementById(`cell-${i * size + j}`).value) || 0;
+          row.push(new SimpleFraction(val));
         }
         matrix.push(row);
       }
@@ -103,10 +403,19 @@
     function determinant(matrix) {
       const n = matrix.length;
       if (n === 1) return matrix[0][0];
-      if (n === 2) return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
-      let det = 0;
+      if (n === 2) {
+        return matrix[0][0].mul(matrix[1][1]).sub(matrix[0][1].mul(matrix[1][0]));
+      }
+      
+      let det = new SimpleFraction(0);
       for (let j = 0; j < n; j++) {
-        det += ((j % 2 === 0 ? 1 : -1) * matrix[0][j] * determinant(minor(matrix, 0, j)));
+        const minorDet = determinant(minor(matrix, 0, j));
+        const cofactor = matrix[0][j].mul(minorDet);
+        if (j % 2 === 0) {
+          det = det.add(cofactor);
+        } else {
+          det = det.sub(cofactor);
+        }
       }
       return det;
     }
@@ -118,7 +427,8 @@
         cof[i] = [];
         for (let j = 0; j < size; j++) {
           const m = minor(matrix, i, j);
-          cof[i][j] = ((i + j) % 2 === 0 ? 1 : -1) * determinant(m);
+          const det = determinant(m);
+          cof[i][j] = ((i + j) % 2 === 0) ? det : det.neg();
         }
       }
       return cof;
@@ -128,24 +438,49 @@
       return matrix[0].map((_, col) => matrix.map(row => row[col]));
     }
 
-    function formatValue(val) {
-      return Math.abs(val % 1) < 1e-10 ? val.toString() : val.toFixed(2);
+    function formatFraction(fraction) {
+      if (fraction.d === 1) {
+        return fraction.n.toString();
+      } else {
+        const absN = Math.abs(fraction.n);
+        const sign = fraction.n < 0 ? '-' : '';
+        
+        if (absN > fraction.d) {
+          // Mixed number
+          const whole = Math.floor(absN / fraction.d);
+          const remainder = absN % fraction.d;
+          if (remainder === 0) {
+            return sign + whole.toString();
+          }
+          return `${sign}${whole} <span class="fraction"><span class="numerator">${remainder}</span><span class="denominator">${fraction.d}</span></span>`;
+        } else {
+          // Proper fraction
+          return `<span class="fraction"><span class="numerator">${sign}${absN}</span><span class="denominator">${fraction.d}</span></span>`;
+        }
+      }
     }
 
     function inverseMatrix(matrix) {
       const det = determinant(matrix);
-      if (det === 0) return null;
+      if (det.equals(0)) return null;
+      
       const cof = cofactorMatrix(matrix);
       const adj = transpose(cof);
-      return adj.map(row => row.map(val => formatValue(val / det)));
+      return adj.map(row => row.map(val => val.div(det)));
     }
 
-    function displayMatrix(mat, title) {
-      let html = `<h3>${title}</h3><div class="matrix" style="grid-template-columns: repeat(${mat.length}, 50px);">`;
+    function displayMatrix(mat, title, className = '') {
+      let html = `<div class="result-section ${className}">`;
+      if (title) html += `<h3>${title}</h3>`;
+      
+      html += `<div class="matrix-brackets"><div class="matrix" style="grid-template-columns: repeat(${mat.length}, 1fr);">`;
       mat.forEach(row => {
-        row.forEach(val => html += `<div>${val}</div>`);
+        row.forEach(val => {
+          const displayVal = val instanceof SimpleFraction ? formatFraction(val) : val;
+          html += `<div class="matrix-cell">${displayVal}</div>`;
+        });
       });
-      html += '</div>';
+      html += '</div></div></div>';
       return html;
     }
 
@@ -156,33 +491,72 @@
       const matrix = getMatrix(size);
 
       if (row >= size || col >= size || row < 0 || col < 0) {
-        alert("Invalid row or column index");
+        document.getElementById('output').innerHTML = 
+          '<div class="result-section"><div class="error">❌ Chỉ số hàng hoặc cột không hợp lệ!</div></div>';
         return;
       }
 
       const mMinor = minor(matrix, row, col);
-      const cofVal = ((row + col) % 2 === 0 ? 1 : -1) * determinant(mMinor);
+      const minorDet = determinant(mMinor);
+      const cofVal = ((row + col) % 2 === 0) ? minorDet : minorDet.neg();
       const cofMatrix = cofactorMatrix(matrix);
       const adj = transpose(cofMatrix);
       const det = determinant(matrix);
       const inv = inverseMatrix(matrix);
 
       let output = '';
-      output += displayMatrix(matrix, 'Matrix A');
-      output += `<h3>Minor of a[${row+1}, ${col+1}]:</h3>` + displayMatrix(mMinor, '');
-      output += `<h3>Cofactor of a[${row+1}, ${col+1}]: ${cofVal}</h3>`;
-      output += displayMatrix(cofMatrix, 'Cofactor Matrix of A');
-      output += displayMatrix(adj, 'Adjugate Matrix of A');
-      output += `<h3>Determinant of A: ${det}</h3>`;
+      
+      // Original Matrix
+      output += displayMatrix(matrix, '📊 Ma Trận A');
+      
+      // Minor
+      output += displayMatrix(mMinor, `🔍 Minor của a[${row+1}, ${col+1}]`);
+      
+      // Cofactor value
+      output += `<div class="result-section">
+        <h3>⚡ Cofactor của a[${row+1}, ${col+1}]</h3>
+        <div class="determinant-value">${formatFraction(cofVal)}</div>
+      </div>`;
+      
+      // Cofactor Matrix
+      output += displayMatrix(cofMatrix, '🎯 Ma Trận Cofactor');
+      
+      // Adjugate Matrix
+      output += displayMatrix(adj, '🔄 Ma Trận Adjugate (Chuyển vị của Cofactor)');
+      
+      // Determinant
+      output += `<div class="result-section">
+        <h3>🎲 Định Thức của Ma Trận A</h3>
+        <div class="determinant-value">det(A) = ${formatFraction(det)}</div>
+      </div>`;
+      
+      // Inverse
       if (inv) {
-        output += displayMatrix(inv, 'Inverse Matrix of A');
+        output += displayMatrix(inv, '↩️ Ma Trận Nghịch Đảo A⁻¹');
       } else {
-        output += `<h3 style="color:red">Matrix A is not invertible (Determinant = 0)</h3>`;
+        output += `<div class="result-section">
+          <div class="error">❌ Ma trận A không khả nghịch (Định thức = 0)</div>
+        </div>`;
       }
+      
       document.getElementById('output').innerHTML = output;
     }
 
+    // Initialize with a sample matrix
     generateMatrix();
+    
+    // Add some sample values for demonstration
+    setTimeout(() => {
+      document.getElementById('cell-0').value = '2';
+      document.getElementById('cell-1').value = '1';
+      document.getElementById('cell-2').value = '3';
+      document.getElementById('cell-3').value = '1';
+      document.getElementById('cell-4').value = '0';
+      document.getElementById('cell-5').value = '1';
+      document.getElementById('cell-6').value = '1';
+      document.getElementById('cell-7').value = '2';
+      document.getElementById('cell-8').value = '1';
+    }, 100);
   </script>
 </body>
 </html>
