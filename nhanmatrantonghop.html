@@ -442,21 +442,8 @@
       if (fraction.d === 1) {
         return fraction.n.toString();
       } else {
-        const absN = Math.abs(fraction.n);
-        const sign = fraction.n < 0 ? '-' : '';
-        
-        if (absN > fraction.d) {
-          // Mixed number
-          const whole = Math.floor(absN / fraction.d);
-          const remainder = absN % fraction.d;
-          if (remainder === 0) {
-            return sign + whole.toString();
-          }
-          return `${sign}${whole} <span class="fraction"><span class="numerator">${remainder}</span><span class="denominator">${fraction.d}</span></span>`;
-        } else {
-          // Proper fraction
-          return `<span class="fraction"><span class="numerator">${sign}${absN}</span><span class="denominator">${fraction.d}</span></span>`;
-        }
+        // Always display as simple fraction (no mixed numbers)
+        return `<span class="fraction"><span class="numerator">${fraction.n}</span><span class="denominator">${fraction.d}</span></span>`;
       }
     }
 
