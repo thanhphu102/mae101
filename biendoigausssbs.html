@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biến Đổi Ma Trận Bậc Thang</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: white;
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .control-panel {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .input-group label {
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    input[type='number'] {
+      padding: 12px 16px;
+      border: 2px solid #e1e5e9;
+      border-radius: 10px;
+      font-size: 16px;
+      text-align: center;
+      transition: all 0.3s ease;
+      width: 80px;
+    }
+
+    input[type='number']:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 5px;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    .btn-secondary:hover {
+      box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    }
+
+    .matrix-input {
+      display: grid;
+      gap: 8px;
+      margin: 20px auto;
+      justify-content: center;
+      max-width: fit-content;
+    }
+
+    .matrix-input input {
+      width: 70px;
+      height: 50px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .steps-container {
+      display: grid;
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .step {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      border-left: 5px solid #667eea;
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .step h3 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .step-number {
+      background: #667eea;
+      color: white;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .matrix {
+      display: inline-grid;
+      gap: 4px;
+      margin: 15px 0;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      border: 2px solid #e9ecef;
+    }
+
+    .matrix-cell {
+      background: white;
+      text-align: center;
+      padding: 10px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      color: #333;
+      border: 1px solid #dee2e6;
+      min-width: 60px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .matrix-brackets {
+      position: relative;
+      display: inline-block;
+      margin: 10px 20px;
+    }
+
+    .matrix-brackets::before,
+    .matrix-brackets::after {
+      content: '';
+      position: absolute;
+      top: -5px;
+      bottom: -5px;
+      width: 8px;
+      border: 2px solid #333;
+    }
+
+    .matrix-brackets::before {
+      left: -12px;
+      border-right: none;
+      border-radius: 8px 0 0 8px;
+    }
+
+    .matrix-brackets::after {
+      right: -12px;
+      border-left: none;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .operation {
+      background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-weight: 600;
+      color: #2d3436;
+      text-align: center;
+    }
+
+    .final-result {
+      border-left-color: #28a745;
+      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    }
+
+    .fraction {
+      display: inline-block;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .fraction .numerator {
+      display: block;
+      border-bottom: 1px solid #333;
+      padding-bottom: 2px;
+      line-height: 1;
+    }
+
+    .fraction .denominator {
+      display: block;
+      padding-top: 2px;
+      line-height: 1;
+    }
+
+    .error {
+      color: #dc3545;
+      font-weight: bold;
+      text-align: center;
+      padding: 15px;
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      border-radius: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .card {
+        padding: 20px;
+      }
+      
+      .control-panel {
+        flex-direction: column;
+        gap: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📐 Biến Đổi Ma Trận Bậc Thang</h1>
+    
+    <div class="card">
+      <div class="control-panel">
+        <div class="input-group">
+          <label>Số hàng:</label>
+          <input type="number" id="rows" value="3" min="2" max="6" />
+        </div>
+        <div class="input-group">
+          <label>Số cột:</label>
+          <input type="number" id="cols" value="4" min="2" max="8" />
+        </div>
+        <button class="btn" onclick="generateMatrix()">🔄 Tạo Ma Trận</button>
+      </div>
+      
+      <div id="matrixContainer" class="matrix-input"></div>
+      
+      <div class="control-panel">
+        <button class="btn" onclick="computeRowEchelon()">⚡ Bậc Thang (REF)</button>
+        <button class="btn btn-secondary" onclick="computeReducedRowEchelon()">🎯 Bậc Thang Rút Gọn (RREF)</button>
+      </div>
+    </div>
+
+    <div id="output" class="steps-container"></div>
+  </div>
+
+  <script>
+    // Simple Fraction class
+    class SimpleFraction {
+      constructor(numerator, denominator = 1) {
+        if (typeof numerator === 'string') {
+          const parts = numerator.split('/');
+          this.n = parseInt(parts[0]) || 0;
+          this.d = parseInt(parts[1]) || 1;
+        } else {
+          this.n = numerator;
+          this.d = denominator;
+        }
+        this.simplify();
+      }
+
+      gcd(a, b) {
+        a = Math.abs(a);
+        b = Math.abs(b);
+        while (b !== 0) {
+          let temp = b;
+          b = a % b;
+          a = temp;
+        }
+        return a;
+      }
+
+      simplify() {
+        if (this.d === 0) throw new Error("Denominator cannot be zero");
+        if (this.n === 0) {
+          this.d = 1;
+          return this;
+        }
+        
+        const gcd = this.gcd(this.n, this.d);
+        this.n = this.n / gcd;
+        this.d = this.d / gcd;
+        
+        if (this.d < 0) {
+          this.n = -this.n;
+          this.d = -this.d;
+        }
+        return this;
+      }
+
+      add(other) {
+        if (typeof other === 'number') other = new SimpleFraction(other);
+        const newN = this.n * other.d + other.n * this.d;
+        const newD = this.d * other.d;
+        return new SimpleFraction(newN, newD);
+      }
+
+      sub(other) {
+        if (typeof other === 'number') other = new SimpleFraction(other);
+        const newN = this.n * other.d - other.n * this.d;
+        const newD = this.d * other.d;
+        return new SimpleFraction(newN, newD);
+      }
+
+      mul(other) {
+        if (typeof other === 'number') other = new SimpleFraction(other);
+        return new SimpleFraction(this.n * other.n, this.d * other.d);
+      }
+
+      div(other) {
+        if (typeof other === 'number') other = new SimpleFraction(other);
+        return new SimpleFraction(this.n * other.d, this.d * other.n);
+      }
+
+      neg() {
+        return new SimpleFraction(-this.n, this.d);
+      }
+
+      equals(other) {
+        if (typeof other === 'number') other = new SimpleFraction(other);
+        return this.n * other.d === other.n * this.d;
+      }
+
+      isZero() {
+        return this.n === 0;
+      }
+
+      toString() {
+        if (this.d === 1) return this.n.toString();
+        return `${this.n}/${this.d}`;
+      }
+    }
+
+    function generateMatrix() {
+      const rows = parseInt(document.getElementById('rows').value);
+      const cols = parseInt(document.getElementById('cols').value);
+      const container = document.getElementById('matrixContainer');
+      container.innerHTML = '';
+      container.style.gridTemplateColumns = `repeat(${cols}, 70px)`;
+      
+      for (let i = 0; i < rows * cols; i++) {
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.id = `cell-${i}`;
+        input.value = Math.floor(Math.random() * 9) + 1;
+        input.step = 'any';
+        container.appendChild(input);
+      }
+    }
+
+    function getMatrix() {
+      const rows = parseInt(document.getElementById('rows').value);
+      const cols = parseInt(document.getElementById('cols').value);
+      const matrix = [];
+      
+      for (let i = 0; i < rows; i++) {
+        const row = [];
+        for (let j = 0; j < cols; j++) {
+          const val = parseFloat(document.getElementById(`cell-${i * cols + j}`).value) || 0;
+          row.push(new SimpleFraction(val));
+        }
+        matrix.push(row);
+      }
+      return matrix;
+    }
+
+    function formatFraction(fraction) {
+      if (fraction.d === 1) {
+        return fraction.n.toString();
+      } else {
+        return `<span class="fraction"><span class="numerator">${fraction.n}</span><span class="denominator">${fraction.d}</span></span>`;
+      }
+    }
+
+    function displayMatrix(matrix, title = '') {
+      const cols = matrix[0].length;
+      let html = '';
+      if (title) html += `<h4>${title}</h4>`;
+      
+      html += `<div class="matrix-brackets">
+        <div class="matrix" style="grid-template-columns: repeat(${cols}, 1fr);">`;
+      
+      matrix.forEach(row => {
+        row.forEach(val => {
+          html += `<div class="matrix-cell">${formatFraction(val)}</div>`;
+        });
+      });
+      
+      html += '</div></div>';
+      return html;
+    }
+
+    function copyMatrix(matrix) {
+      return matrix.map(row => row.map(cell => new SimpleFraction(cell.n, cell.d)));
+    }
+
+    function swapRows(matrix, row1, row2) {
+      [matrix[row1], matrix[row2]] = [matrix[row2], matrix[row1]];
+    }
+
+    function multiplyRow(matrix, row, scalar) {
+      for (let j = 0; j < matrix[row].length; j++) {
+        matrix[row][j] = matrix[row][j].mul(scalar);
+      }
+    }
+
+    function addMultipleOfRow(matrix, targetRow, sourceRow, scalar) {
+      for (let j = 0; j < matrix[targetRow].length; j++) {
+        matrix[targetRow][j] = matrix[targetRow][j].add(matrix[sourceRow][j].mul(scalar));
+      }
+    }
+
+    function findPivot(matrix, startRow, col) {
+      for (let i = startRow; i < matrix.length; i++) {
+        if (!matrix[i][col].isZero()) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
+    function computeRowEchelon() {
+      const originalMatrix = getMatrix();
+      const matrix = copyMatrix(originalMatrix);
+      const steps = [];
+      const rows = matrix.length;
+      const cols = matrix[0].length;
+      
+      steps.push({
+        title: 'Ma trận ban đầu',
+        matrix: copyMatrix(originalMatrix),
+        operation: 'Bắt đầu quá trình biến đổi ma trận về dạng bậc thang (Row Echelon Form)'
+      });
+
+      let currentRow = 0;
+      let stepNumber = 1;
+
+      for (let col = 0; col < cols && currentRow < rows; col++) {
+        // Find pivot
+        const pivotRow = findPivot(matrix, currentRow, col);
+        
+        if (pivotRow === -1) continue; // No pivot in this column
+        
+        // Swap rows if needed
+        if (pivotRow !== currentRow) {
+          swapRows(matrix, currentRow, pivotRow);
+          steps.push({
+            title: `Bước ${stepNumber++}: Hoán đổi hàng`,
+            matrix: copyMatrix(matrix),
+            operation: `Hoán đổi hàng ${currentRow + 1} ↔ hàng ${pivotRow + 1} để đưa phần tử khác 0 lên vị trí pivot`
+          });
+        }
+
+        // Make pivot = 1 if it's not already
+        const pivot = matrix[currentRow][col];
+        if (!pivot.equals(1) && !pivot.isZero()) {
+          multiplyRow(matrix, currentRow, new SimpleFraction(1).div(pivot));
+          steps.push({
+            title: `Bước ${stepNumber++}: Chuẩn hóa pivot`,
+            matrix: copyMatrix(matrix),
+            operation: `Nhân hàng ${currentRow + 1} với ${formatFraction(new SimpleFraction(1).div(pivot))} để pivot = 1`
+          });
+        }
+
+        // Eliminate below pivot
+        for (let i = currentRow + 1; i < rows; i++) {
+          const factor = matrix[i][col];
+          if (!factor.isZero()) {
+            addMultipleOfRow(matrix, i, currentRow, factor.neg());
+            steps.push({
+              title: `Bước ${stepNumber++}: Khử phần tử dưới pivot`,
+              matrix: copyMatrix(matrix),
+              operation: `Hàng ${i + 1} = Hàng ${i + 1} - (${formatFraction(factor)}) × Hàng ${currentRow + 1}`
+            });
+          }
+        }
+
+        currentRow++;
+      }
+
+      steps.push({
+        title: '🎉 Kết quả: Ma trận bậc thang (REF)',
+        matrix: copyMatrix(matrix),
+        operation: 'Hoàn thành! Ma trận đã được biến đổi về dạng bậc thang.',
+        isResult: true
+      });
+
+      displaySteps(steps);
+    }
+
+    function computeReducedRowEchelon() {
+      const originalMatrix = getMatrix();
+      const matrix = copyMatrix(originalMatrix);
+      const steps = [];
+      const rows = matrix.length;
+      const cols = matrix[0].length;
+      
+      steps.push({
+        title: 'Ma trận ban đầu',
+        matrix: copyMatrix(originalMatrix),
+        operation: 'Bắt đầu quá trình biến đổi ma trận về dạng bậc thang rút gọn (RREF)'
+      });
+
+      let currentRow = 0;
+      let stepNumber = 1;
+      const pivotCols = [];
+
+      // Forward elimination (same as REF)
+      for (let col = 0; col < cols && currentRow < rows; col++) {
+        const pivotRow = findPivot(matrix, currentRow, col);
+        
+        if (pivotRow === -1) continue;
+        
+        pivotCols.push({row: currentRow, col: col});
+        
+        if (pivotRow !== currentRow) {
+          swapRows(matrix, currentRow, pivotRow);
+          steps.push({
+            title: `Bước ${stepNumber++}: Hoán đổi hàng`,
+            matrix: copyMatrix(matrix),
+            operation: `Hoán đổi hàng ${currentRow + 1} ↔ hàng ${pivotRow + 1}`
+          });
+        }
+
+        const pivot = matrix[currentRow][col];
+        if (!pivot.equals(1) && !pivot.isZero()) {
+          multiplyRow(matrix, currentRow, new SimpleFraction(1).div(pivot));
+          steps.push({
+            title: `Bước ${stepNumber++}: Chuẩn hóa pivot`,
+            matrix: copyMatrix(matrix),
+            operation: `Nhân hàng ${currentRow + 1} với ${formatFraction(new SimpleFraction(1).div(pivot))}`
+          });
+        }
+
+        for (let i = currentRow + 1; i < rows; i++) {
+          const factor = matrix[i][col];
+          if (!factor.isZero()) {
+            addMultipleOfRow(matrix, i, currentRow, factor.neg());
+            steps.push({
+              title: `Bước ${stepNumber++}: Khử dưới pivot`,
+              matrix: copyMatrix(matrix),
+              operation: `Hàng ${i + 1} = Hàng ${i + 1} - (${formatFraction(factor)}) × Hàng ${currentRow + 1}`
+            });
+          }
+        }
+
+        currentRow++;
+      }
+
+      // Backward elimination (make RREF)
+      for (let i = pivotCols.length - 1; i >= 0; i--) {
+        const {row: pivotRow, col: pivotCol} = pivotCols[i];
+        
+        for (let j = 0; j < pivotRow; j++) {
+          const factor = matrix[j][pivotCol];
+          if (!factor.isZero()) {
+            addMultipleOfRow(matrix, j, pivotRow, factor.neg());
+            steps.push({
+              title: `Bước ${stepNumber++}: Khử trên pivot`,
+              matrix: copyMatrix(matrix),
+              operation: `Hàng ${j + 1} = Hàng ${j + 1} - (${formatFraction(factor)}) × Hàng ${pivotRow + 1}`
+            });
+          }
+        }
+      }
+
+      steps.push({
+        title: '🏆 Kết quả: Ma trận bậc thang rút gọn (RREF)',
+        matrix: copyMatrix(matrix),
+        operation: 'Hoàn thành! Ma trận đã được biến đổi về dạng bậc thang rút gọn.',
+        isResult: true
+      });
+
+      displaySteps(steps);
+    }
+
+    function displaySteps(steps) {
+      const output = document.getElementById('output');
+      output.innerHTML = '';
+
+      steps.forEach((step, index) => {
+        const stepDiv = document.createElement('div');
+        stepDiv.className = step.isResult ? 'step final-result' : 'step';
+        
+        stepDiv.innerHTML = `
+          <h3>
+            ${step.isResult ? '🎯' : `<span class="step-number">${index === 0 ? '🚀' : index}</span>`}
+            ${step.title}
+          </h3>
+          ${step.operation ? `<div class="operation">${step.operation}</div>` : ''}
+          ${displayMatrix(step.matrix)}
+        `;
+        
+        output.appendChild(stepDiv);
+      });
+    }
+
+    // Initialize
+    generateMatrix();
+    
+    // Add sample values
+    setTimeout(() => {
+      const rows = parseInt(document.getElementById('rows').value);
+      const cols = parseInt(document.getElementById('cols').value);
+      const sampleValues = [2, -1, 3, 1, 1, 2, -1, 3, 3, 1, 2, 5];
+      
+      for (let i = 0; i < Math.min(rows * cols, sampleValues.length); i++) {
+        const cell = document.getElementById(`cell-${i}`);
+        if (cell) cell.value = sampleValues[i];
+      }
+    }, 100);
+  </script>
+</body>
+</html>
