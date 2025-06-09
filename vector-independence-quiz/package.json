@@ -1,0 +1,14 @@
+{
+  "name": "vector-independence-quiz",
+  "version": "1.0.0",
+  "description": "A quiz application to test knowledge on vector independence and dependence.",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "live-server public"
+  },
+  "dependencies": {
+    "live-server": "^1.2.1"
+  },
+  "author": "",
+  "license": "ISC"
+}
