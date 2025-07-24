@@ -1,0 +1,240 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Học và Luyện tập: Đa thức đặc trưng</title>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  
+  <style>
+    /* --- General Layout --- */
+    :root {
+      --primary-color: #007bff;
+      --secondary-color: #28a745;
+      --light-gray: #f0f2f5;
+      --white: #fff;
+      --dark-text: #333;
+      --border-color: #ddd;
+      --highlight-color: #f6ad55; /* Màu cho highlight */
+      --highlight-hex: '#f6ad55'; /* Mã màu HEX cho MathJax \color */
+    }
+    html, body {
+      margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      height: 100vh; width: 100vw; overflow: hidden; background-color: var(--light-gray);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .main-container { display: flex; width: 100%; height: 100%; }
+    .panel {
+      flex: 1; padding: 20px; box-sizing: border-box;
+      display: flex; flex-direction: column; height: 100%;
+    }
+    .panel-left { border-right: 2px solid var(--border-color); max-width: 50%; }
+    h1, h2, h3 { color: var(--dark-text); border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 0; }
+    h2 { margin-top: 1.5em; }
+    h3 { margin-top: 1em; }
+
+    /* --- Left Panel: HTML SLIDER & Lecture --- */
+    .slider-section h3 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .toggle-slider {
+        font-size: 14px;
+        font-weight: normal;
+        color: var(--primary-color);
+        cursor: pointer;
+        user-select: none;
+    }
+    .toggle-slider:hover { text-decoration: underline; }
+
+    .slider-container {
+        width: 100%; aspect-ratio: 16 / 9; overflow: hidden; position: relative;
+        background-color: #000; border-radius: 8px;
+    }
+    .slides-wrapper { display: flex; height: 100%; transition: transform 0.5s ease-in-out; }
+    .slide {
+        flex: 0 0 100%; width: 100%; height: 100%; box-sizing: border-box; padding: 20px;
+        color: white; display: flex; flex-direction: column; align-items: center;
+        justify-content: center; text-align: center; background: linear-gradient(135deg, #4a5568, #2d3748);
+        font-size: 1.1em;
+    }
+    .slide h4 { font-size: 1.4em; color: #a0aec0; border-bottom: 1px solid #4a5568; margin-bottom: 20px; text-align: center; }
+    .slide p, .slide ul, .slide ol { text-align: left; max-width: 90%; }
+    .slide .info-block { background-color: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid var(--primary-color); text-align: left; }
+    .slide .alert-block { background-color: rgba(255, 100, 100, 0.15); padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #e53e3e; text-align: left;}
+    .slide .highlight { color: var(--highlight-color); font-weight: bold; }
+    .slide strong { color: var(--highlight-color); }
+    
+    .slider-nav {
+        position: absolute; top: 50%; transform: translateY(-50%); width: 100%;
+        display: flex; justify-content: space-between; padding: 0 10px; box-sizing: border-box;
+    }
+    .slider-nav button { background-color: rgba(0,0,0,0.5); color: white; border: none; padding: 10px 15px; border-radius: 50%; cursor: pointer; font-size: 24px; line-height: 1; transition: background-color 0.3s; }
+    .slider-nav button:hover { background-color: rgba(0,0,0,0.8); }
+    .hidden { display: none !important; }
+
+    .lecture-container { flex-grow: 1; overflow-y: auto; padding-right: 15px; border-top: 2px solid var(--border-color); margin-top: 20px; padding-top: 10px; }
+    .info-box { background-color: #e9ecef; border-left: 5px solid var(--primary-color); padding: 15px; margin: 20px 0; border-radius: 5px; }
+    .info-box-gray { background-color: #f8f9fa; border-left: 5px solid #6c757d; padding: 15px; margin: 20px 0; border-radius: 5px; }
+    
+    /* --- Right Panel (Unchanged) --- */
+    .audio-section { margin-bottom: 20px; text-align: center; } .audio-section h3 { margin-top: 0; } .audio-section iframe { border-radius: 12px; } .audio-section a { font-size:12px; color: #555; text-decoration: none; } .audio-section a:hover { text-decoration: underline; } .quiz-wrapper { flex-grow: 1; overflow-y: auto; border-top: 2px solid var(--border-color); margin-top: 20px; padding-top: 10px; text-align: left; } .quiz-container { background: var(--white); padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); } .question { margin-bottom: 15px; font-size: 18px; font-weight: 500;} .option { display: flex; align-items: center; margin: 10px 0; } .option input[type="radio"] { margin-right: 10px; transform: scale(1.1); } .option label { flex-grow: 1; } .quiz-buttons { margin-top: 20px; } button { padding: 10px 20px; font-size: 16px; border: none; border-radius: 6px; cursor: pointer; margin-right: 10px; transition: background-color 0.2s, transform 0.1s; } button:active { transform: translateY(1px); } .next-btn { background-color: var(--primary-color); color: white; } .submit-btn { background-color: var(--secondary-color); color: white; } .result { font-weight: bold; font-size: 20px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <div class="panel panel-left">
+      <div class="slider-section">
+        <h3>
+            <span>Bài giảng Trực quan</span>
+            <span class="toggle-slider" onclick="toggleSliderVisibility()">[Ẩn]</span>
+        </h3>
+        <div class="slider-container">
+          <div class="slides-wrapper">
+            <!-- SLIDE CONTENT TRANSLATED FROM BEAMER & MATHJAX FIXED -->
+            <div class="slide">
+              <h4>Định nghĩa Đa thức Đặc trưng</h4>
+              <p>Cho ma trận vuông \(A \in \mathbb{R}^{n \times n}\).</p>
+              <div class="info-block">
+                <p><span class="highlight">Đa thức đặc trưng</span> của \(A\), ký hiệu là \(\chi_A(x)\), được định nghĩa là:</p>
+                $$ \chi_A(x) = \det(xI - A) $$
+              </div>
+              <p>Đây là một đa thức bậc \(n\) theo biến \(x\) có dạng tổng quát:</p>
+              $$ \chi_A(x) = x^n + a_{n-1}x^{n-1} + \dots + a_1 x + a_0 $$
+            </div>
+
+            <div class="slide">
+              <h4>Liên hệ với Vết và Định thức</h4>
+              <p>Các hệ số của đa thức đặc trưng có mối liên hệ chặt chẽ với các tính chất cơ bản của ma trận.</p>
+              <div class="alert-block">
+                <p><strong>Các công thức quan trọng</strong></p>
+                <ul>
+                  <li>Hệ số của \(x^{n-1}\) chính là <span class="highlight">âm của vết (trace)</span>: $$ a_{n-1} = -\operatorname{tr}(A) = -\sum_{i=1}^{n} a_{ii} $$</li>
+                  <li>Hệ số tự do \(a_0\) liên quan đến <span class="highlight">định thức (determinant)</span>: $$ a_0 = \chi_A(0) = \det(-A) = (-1)^n \cdot \det(A) $$</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="slide">
+              <h4>Mẹo giải nhanh cho ma trận \(3 \times 3\)</h4>
+              <p>Với trường hợp ma trận \(3 \times 3\) thường gặp trong các bài thi:</p>
+              $$ \chi_A(x) = x^3 \color{#f6ad55}{- \operatorname{tr}(A)} x^2 + c_1 x \color{#f6ad55}{- \det(A)} $$
+              <div class="info-block">
+                <p><strong>Chiến lược loại trừ đáp án</strong></p>
+                <ol>
+                  <li><strong>Tính Vết:</strong> Tìm \(\operatorname{tr}(A)\). So sánh hệ số của \(x^2\) với \(-\operatorname{tr}(A)\).</li>
+                  <li><strong>Tính Định thức:</strong> Tìm \(\det(A)\). So sánh hệ số tự do với \(-\det(A)\).</li>
+                  <li><strong>Loại trừ:</strong> Dùng 2 kết quả trên để nhanh chóng loại bỏ các đáp án sai.</li>
+                </ol>
+              </div>
+            </div>
+
+            <div class="slide">
+              <h4>Ví dụ minh họa chiến lược</h4>
+              <div class="info-block">
+                <p><strong>Cho ma trận:</strong></p>
+                $$ A = \begin{bmatrix} 1 & 0 & 2 \\ -2 & 3 & -3 \\ 0 & 2 & 2 \end{bmatrix} $$
+              </div>
+              <p style="margin-top:20px;"><strong>Bước 1: Tính Vết</strong><br>\(\operatorname{tr}(A) = 1 + 3 + 2 = \color{#f6ad55}{6}\) \(\Rightarrow\) Hệ số của \(x^2\) phải là \(\color{#f6ad55}{-6}\).</p>
+              <p><strong>Bước 2: Tính Định thức</strong><br>\(\det(A) = 12 - 8 = \color{#f6ad55}{4}\) \(\Rightarrow\) Hệ số tự do phải là \(\color{#f6ad55}{-4}\).</p>
+              <p><strong>Kết luận:</strong> Đa thức cần tìm có dạng: $$ \chi_A(x) = x^3 \color{#f6ad55}{- 6}x^2 + c_1x \color{#f6ad55}{- 4} $$</p>
+            </div>
+            
+            <div class="slide">
+              <h4>Hệ số tổng quát (Nâng cao)</h4>
+              <p>Định lý <strong>Faddeev–LeVerrier</strong> cho phép tìm tất cả các hệ số.</p>
+              <div class="info-block">
+                <p>Công thức cho hệ số của \(x\) (trường hợp \(n=3\)):</p>
+                $$ c_1 = \frac{1}{2} \left[ (\operatorname{tr}A)^2 - \operatorname{tr}(A^2) \right] $$
+              </div>
+              <div class="alert-block">
+                <p>Công thức đầy đủ cho ma trận \(3 \times 3\):</p>
+                $$ \chi_A(x) = x^3 - \operatorname{tr}(A) x^2 + \frac{1}{2}\left[(\operatorname{tr}A)^2 - \operatorname{tr}(A^2) \right]x - \det(A) $$
+              </div>
+            </div>
+
+            <div class="slide">
+                <h4>Ví dụ áp dụng công thức đầy đủ</h4>
+                <p>Xét lại ma trận \( A = \begin{bmatrix} 1 & 0 & 2 \\ -2 & 3 & -3 \\ 0 & 2 & 2 \end{bmatrix} \)</p>
+                <p>Ta đã có: \(\operatorname{tr}(A)=6\) và \(\det(A)=4\).</p>
+                <p>Tính \(A^2\), ta có \(\operatorname{tr}(A^2) = 1 + 3 + 2 = \color{#f6ad55}{6}\). </p>
+                <p>Hệ số của \(x\) là: \( c_1 = \frac{1}{2} (6^2 - 6) = \frac{30}{2} = \color{#f6ad55}{15} \)</p>
+                <div class="alert-block">
+                    <p>Đa thức đặc trưng hoàn chỉnh:</p>
+                    $$ \chi_A(x) = x^3 - 6x^2 + 15x - 4 $$
+                </div>
+            </div>
+
+            <div class="slide">
+              <h4>Tóm tắt chiến lược</h4>
+              <p>Để giải nhanh các bài toán về đa thức đặc trưng:</p>
+              <ol>
+                  <li>Nắm vững định nghĩa \(\chi_A(x) = \det(xI - A)\).</li>
+                  <li>Luôn tính <span class="highlight">Vết</span> và <span class="highlight">Định thức</span> đầu tiên.</li>
+                  <li>Suy ra dạng của đa thức: \( \chi_A(x) = x^3 - (\operatorname{tr}A)x^2 + \dots - (\det A) \)</li>
+                  <li>Đối chiếu với các đáp án để loại trừ.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+        <div class="slider-nav">
+          <button class="prev-btn" onclick="prevSlide()">&#10094;</button>
+          <button class="next-btn" onclick="nextSlide()">&#10095;</button>
+        </div>
+      </div>
+
+      <!-- **FULLY UPDATED** LECTURE CONTENT -->
+      <div class="lecture-container">
+        <div class="lecture-content">
+            <h1>Bài giảng: Liên hệ giữa đa thức đặc trưng, vết và định thức ma trận</h1>
+            <h2>1. Định nghĩa đa thức đặc trưng</h2>
+            <p>Cho ma trận vuông \(A \in \mathbb{R}^{n \times n}\), <strong>đa thức đặc trưng</strong> của \(A\) là: $$ \chi_A(x) = \det(xI - A) $$ Đây là một đa thức bậc \(n\) có dạng: $$ \chi_A(x) = x^n + a_{n-1}x^{n-1} + \dots + a_1 x + a_0 $$ </p>
+            <h2>2. Liên hệ giữa các hệ số và tính chất của ma trận</h2>
+            <div class="info-box"><h4>Công thức quan trọng</h4><ul><li>Hệ số \(a_{n-1}\) liên quan đến <strong>vết (trace)</strong> của ma trận: $$ a_{n-1} = -\operatorname{tr}(A) = -\sum_{i=1}^{n} a_{ii} $$ </li><li>Hệ số tự do \(a_0\) liên quan đến <strong>định thức</strong>: $$ a_0 = (-1)^n \cdot \det(A) $$ </li><li>Các hệ số khác có thể được tính qua <strong>định lý Faddeev–LeVerrier</strong> (không cần thiết cho bài quiz).</li></ul></div>
+            <h2>3. Mẹo giải nhanh bài trắc nghiệm đa thức đặc trưng</h2>
+            <p>Khi cho ma trận \(3 \times 3\), ta có: $$ \chi_A(x) = x^3 - \operatorname{tr}(A) x^2 + c x - \det(A) $$ <strong>Chiến lược:</strong><ol><li>Tính vết: $$ \operatorname{tr}(A) = a_{11} + a_{22} + a_{33} \Rightarrow \text{ hệ số } x^2 = -\operatorname{tr}(A) $$ </li><li>Tính định thức (nếu có thể): $$ a_0 = -\det(A) \Rightarrow \text{ hệ số tự do là } -\det(A) $$ </li><li>Thay vào các đáp án trắc nghiệm để loại trừ nhanh.</li></ol></p>
+            <h2>4. Ví dụ minh họa</h2>
+            <p>Cho ma trận: $$ A = \begin{bmatrix} 1 & 0 & 2 \\ -2 & 3 & -3 \\ 0 & 2 & 2 \end{bmatrix} $$ <strong>Bước 1:</strong> Tính vết: $$ \operatorname{tr}(A) = 1 + 3 + 2 = 6 \Rightarrow \text{hệ số } x^2 = -6 $$ <strong>Bước 2:</strong> Tính định thức (dễ hoặc nhờ máy): $$ \det(A) = 4 \Rightarrow \text{hệ số tự do } = -4 $$ <strong>Suy ra:</strong> Đa thức đặc trưng có dạng: $$ \chi_A(x) = x^3 - 6x^2 + bx - 4 $$ Chọn đáp án có dạng đúng như trên.</p>
+            <h2>5. Định lý Faddeev–LeVerrier</h2>
+            <p>Định lý Faddeev–LeVerrier cung cấp một phương pháp đệ quy để tính các hệ số của đa thức đặc trưng: $$ \chi_A(x) = x^n + a_{n-1} x^{n-1} + \dots + a_1 x + a_0 $$</p>
+            <h3>Công thức tổng quát</h3>
+            <p>Gọi \(S_k = \operatorname{tr}(A^k)\), thì các hệ số \(a_k\) được tính theo công thức: $$ a_{n-k} = -\frac{1}{k} \sum_{j=1}^{k} a_{n-j} \cdot S_{k-j} \quad \text{với } a_n = 1 $$</p>
+            <p>Cụ thể với ma trận bậc 3 (\( n = 3 \)): $$ \begin{align*} a_2 &= -\operatorname{tr}(A) \\ a_1 &= \frac{1}{2} \left[ \left(\operatorname{tr}(A)\right)^2 - \operatorname{tr}(A^2) \right] \\ a_0 &= -\det(A) \end{align*} $$</p>
+            <h3>Ví dụ minh hoạ</h3>
+            <p>Cho ma trận: $$ A = \begin{bmatrix} 1 & 0 & 2 \\ -2 & 3 & -3 \\ 0 & 2 & 2 \end{bmatrix} $$ <strong>Bước 1:</strong> Tính \( \operatorname{tr}(A) = 1 + 3 + 2 = 6 \Rightarrow a_2 = -6 \) </p>
+            <p><strong>Bước 2:</strong> Tính \( \operatorname{tr}(A^2) \)<br>Tính: $$ A^2 = A \cdot A = \begin{bmatrix} 1 & 0 & 2 \\ -2 & 3 & -3 \\ 0 & 2 & 2 \end{bmatrix} \cdot \begin{bmatrix} 1 & 0 & 2 \\ -2 & 3 & -3 \\ 0 & 2 & 2 \end{bmatrix} = \begin{bmatrix} 1 & 4 & 6 \\ -8 & 3 & -12 \\ -4 & 10 & 2 \end{bmatrix} \Rightarrow \operatorname{tr}(A^2) = 1 + 3 + 2 = 6 $$ </p>
+            <p><strong>Bước 3:</strong> Suy ra: $$ a_1 = \frac{1}{2} \left(6^2 - 6\right) = \frac{1}{2} (36 - 6) = 15 $$ </p>
+            <p><strong>Bước 4:</strong> Tính định thức: $$ \det(A) = 4 \Rightarrow a_0 = -4 $$ </p>
+            <p><strong>Vậy:</strong> Đa thức đặc trưng: $$ \chi_A(x) = x^3 - 6x^2 + 15x - 4 $$ </p>
+            <h3>Tóm tắt</h3>
+            <div class="info-box-gray">Với ma trận bậc 3: $$ \chi_A(x) = x^3 - \operatorname{tr}(A) x^2 + \frac{1}{2} \left[(\operatorname{tr}A)^2 - \operatorname{tr}(A^2) \right] x - \det(A) $$</div>
+            <h2>6. Kết luận</h2>
+            <p>Để giải nhanh các câu hỏi về đa thức đặc trưng trong bài thi trắc nghiệm:</p><ul><li>Luôn xác định <strong>vết</strong> và <strong>định thức</strong> trước.</li><li>Suy luận nhanh dạng của đa thức đặc trưng dựa trên: $$ \chi_A(x) = x^3 - \operatorname{tr}(A)x^2 + bx - \det(A) $$</li><li>So sánh với các đáp án đã cho để loại trừ.</li></ul>
+        </div>
+      </div>
+    </div>
+    
+    <div class="panel panel-right">
+      <div class="audio-section"><h3>Âm thanh giảng bài</h3><div><iframe width="300" height="60" src="https://vocaroo.com/embed/1eypSBwHqA6p?autoplay=0" frameborder="0" allow="autoplay"></iframe><br><a href="https://voca.ro/1eypSBwHqA6p" title="Vocaroo Voice Recorder" target="_blank">View on Vocaroo &gt;&gt;</a></div></div>
+      <div class="quiz-wrapper"><div class="quiz-container"><h3>Bài tập trắc nghiệm</h3><div id="quiz"></div><div class="quiz-buttons"><button class="submit-btn" onclick="submitQuiz()">Kiểm tra</button><button class="next-btn" onclick="nextQuestion()">Câu tiếp</button></div><div class="result" id="result"></div></div></div>
+    </div>
+  </div>
+
+  <script>
+    const slidesWrapper = document.querySelector('.slides-wrapper'); const slides = document.querySelectorAll('.slide'); let currentSlideIndex = 0; const totalSlides = slides.length;
+    function showSlide(index) { if (index >= totalSlides) { currentSlideIndex = 0; } else if (index < 0) { currentSlideIndex = totalSlides - 1; } else { currentSlideIndex = index; } slidesWrapper.style.transform = `translateX(${-currentSlideIndex * 100}%)`; }
+    function nextSlide() { showSlide(currentSlideIndex + 1); }
+    function prevSlide() { showSlide(currentSlideIndex - 1); }
+    function toggleSliderVisibility() { const sliderContainer = document.querySelector('.slider-container'); const sliderNav = document.querySelector('.slider-nav'); const toggleButton = document.querySelector('.toggle-slider'); sliderContainer.classList.toggle('hidden'); sliderNav.classList.toggle('hidden'); if (sliderContainer.classList.contains('hidden')) { toggleButton.innerHTML = '[Hiện]'; } else { toggleButton.innerHTML = '[Ẩn]'; } }
+    const quizData = [ { question: `Tìm $$ \\chi_A(x) \\text{ với } A = \\begin{bmatrix} 2 & 5 & 4 \\\\ -1 & 4 & -1 \\\\ 0 & -2 & 3 \\end{bmatrix} $$`, options: [ "x^3 - 7x^2 + 29x - 43", "x^3 - 9x^2 + 29x - 43", "3x^3 - 9x^2 + 29x - 43", "x^3 - 9x^2 + 30x - 43" ], answer: 1 }, { question: `Tìm $$ \\chi_A(x) \\text{ với } A = \\begin{bmatrix} 5 & -1 & -2 \\\\ 1 & -4 & -4 \\\\ 2 & -2 & -2 \\end{bmatrix} $$`, options: [ "x^2 - 25x + 6", "x^3 + x^2 - 25x + 6", "x^3 + 3x^2 - 25x + 6", "3x^3 + x^2 - 25x + 6" ], answer: 1 }, { question: `Tìm $$ \\chi_A(x) \\text{ với } A = \\begin{bmatrix} -1 & -5 & -2 \\\\ 4 & 0 & 5 \\\\ -1 & 0 & -1 \\end{bmatrix} $$`, options: [ "x^3 + 4x^2 + 19x - 5", "x^3 + 2x^2 + 19x - 5", "2x^3 + 2x^2 + 19x - 5", "x^3 + 19x - 5" ], answer: 1 }, { question: `Tìm $$ \\chi_A(x) \\text{ với } A = \\begin{bmatrix} 2 & -4 & 0 \\\\ 4 & 5 & -2 \\\\ 0 & 4 & -5 \\end{bmatrix} $$`, options: [ "-x^3 - 2x^2 - x + 114", "x^3 - 4x^2 - x + 114", "x^3 - 2x^2 - x + 114", "x^3 - 2x^2 + x + 114" ], answer: 2 }, { question: `Tìm $$ \\chi_A(x) \\text{ với } A = \\begin{bmatrix} 4 & 1 & 4 \\\\ 1 & 4 & -5 \\\\ 5 & -2 & 2 \\end{bmatrix} $$`, options: [ "x^3 - 10x^2 + 123", "x^3 - 10x^2 + x + 123", "-x^3 - 10x^2 + x + 123", "x^3 - 10x^2 + 3x + 123" ], answer: 1 } ];
+    let currentQuestion = 0; const quizEl = document.getElementById("quiz"); const resultEl = document.getElementById("result");
+    function loadQuestion() { resultEl.innerHTML = ""; const q = quizData[currentQuestion]; let html = `<div class='question'>Câu ${currentQuestion + 1}: ${q.question}</div>`; q.options.forEach((opt, i) => { html += `<div class="option"><input type="radio" name="answer" value="${i}" id="opt${i}" /><label for="opt${i}">(${String.fromCharCode(65 + i)}) \\(${opt}\\)</label></div>`; }); quizEl.innerHTML = html; if (window.MathJax && window.MathJax.typesetPromise) { MathJax.typesetPromise([quizEl]); } }
+    function nextQuestion() { if (currentQuestion < quizData.length - 1) { currentQuestion++; loadQuestion(); } else { alert("Bạn đã hoàn thành tất cả các câu hỏi!"); } }
+    function submitQuiz() { const selected = document.querySelector("input[name='answer']:checked"); if (!selected) { alert("Bạn chưa chọn đáp án!"); return; } const answerIndex = parseInt(selected.value); const correctIndex = quizData[currentQuestion].answer; if (answerIndex === correctIndex) { resultEl.innerHTML = `<span style='color:green'>✅ Chính xác!</span>`; } else { const correctLetter = String.fromCharCode(65 + correctIndex); resultEl.innerHTML = `<span style='color:red'>❌ Sai rồi. Đáp án đúng là (${correctLetter})</span>`; } }
+    document.addEventListener('DOMContentLoaded', function() { showSlide(currentSlideIndex); loadQuestion(); });
+  </script>
+</body>
+</html>
