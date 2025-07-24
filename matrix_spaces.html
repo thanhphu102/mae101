@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Matrix Null Space & Image Visualizer</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%); }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px #0074d933, 0 1.5px 6px #0001;
+            padding: 38px 32px 32px 32px;
+            border: 1.5px solid #e3eaff;
+        }
+        h2 {
+            color: #0074D9;
+            margin-top: 0;
+            letter-spacing: 1px;
+            font-size: 2.1em;
+            text-align: center;
+        }
+        label { font-weight: 500; }
+        .note {
+            color: #555;
+            font-size: 1.04em;
+            margin-bottom: 18px;
+            background: #eaf6ff;
+            border-left: 4px solid #0074D9;
+            padding: 10px 18px;
+            border-radius: 8px;
+        }
+        .input-row {
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .input-row label {
+            margin-right: 8px;
+        }
+        .matrix-input-table {
+            border-collapse: separate;
+            border-spacing: 6px 6px;
+            margin: 8px 0;
+        }
+        .matrix-input-table td {
+            padding: 0;
+        }
+        .matrix-input-table input[type="number"] {
+            width: 54px;
+            padding: 6px 4px;
+            font-size: 1.08em;
+            border-radius: 6px;
+            border: 1.5px solid #b3d1f7;
+            text-align: center;
+            background: #f7fbff;
+            transition: border 0.2s;
+        }
+        .matrix-input-table input[type="number"]:focus {
+            border: 1.5px solid #0074D9;
+            background: #eaf6ff;
+            outline: none;
+        }
+        button {
+            margin: 0 8px 0 0;
+            padding: 9px 22px;
+            border: none;
+            border-radius: 7px;
+            background: linear-gradient(90deg, #0074D9 60%, #00c3ff 100%);
+            color: #fff;
+            font-size: 1.08em;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #0074d91a;
+            transition: background 0.18s, box-shadow 0.18s;
+        }
+        button:hover {
+            background: linear-gradient(90deg, #005fa3 60%, #00aaff 100%);
+            box-shadow: 0 4px 16px #0074d92a;
+        }
+        select, input[type=number] {
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1.2px solid #bbb;
+            font-size: 1em;
+            margin-right: 8px;
+        }
+        .step {
+            margin-bottom: 36px;
+            background: #f7fbff;
+            border-radius: 12px;
+            padding: 22px 22px 14px 22px;
+            box-shadow: 0 1.5px 8px #0074d91a;
+            border-left: 7px solid #0074D9;
+            position: relative;
+            margin-top: 36px;
+            transition: box-shadow 0.2s;
+        }
+        .step-title {
+            font-size: 1.25em;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(90deg, #0074D9 60%, #00c3ff 100%);
+            border-radius: 8px 8px 8px 0;
+            padding: 8px 18px 8px 18px;
+            margin: -30px 0 18px -30px;
+            display: inline-block;
+            box-shadow: 0 2px 8px #0074d92a;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 2;
+        }
+        .step-sub {
+            font-size: 1.09em;
+            font-weight: 600;
+            color: #0074D9;
+            margin: 22px 0 8px 0;
+            background: #eaf6ff;
+            border-left: 4px solid #0074D9;
+            border-radius: 6px 0 0 6px;
+            padding: 7px 16px;
+            display: inline-block;
+            box-shadow: 0 1px 4px #0074d91a;
+            letter-spacing: 0.2px;
+        }
+        .step-sub-en {
+            font-size: 0.98em;
+            color: #888;
+            font-style: italic;
+            margin-left: 10px;
+            margin-bottom: 4px;
+            display: inline-block;
+        }
+        .step .subtitle-en {
+            margin-bottom: 8px;
+            display: block;
+        }
+        .step.active {
+            box-shadow: 0 4px 24px #0074d955, 0 1.5px 6px #0001;
+            border-left: 7px solid #00c3ff;
+        }
+        .matrix {
+            font-family: 'Fira Mono', 'Consolas', monospace;
+            white-space: pre;
+            margin: 10px 0 10px 0;
+            border-collapse: collapse;
+        }
+        .matrix td {
+            border: 1.2px solid #b3d1f7;
+            padding: 6px 14px;
+            min-width: 38px;
+            text-align: center;
+            font-size: 1.08em;
+            background: #fafdff;
+            transition: background 0.2s;
+        }
+        .matrix td.pivot {
+            background: #d2eaff;
+            font-weight: bold;
+            color: #0074D9;
+        }
+        .vector {
+            font-family: 'Fira Mono', 'Consolas', monospace;
+            background: #eaf6ff;
+            border-radius: 5px;
+            padding: 2px 10px;
+            margin: 0 2px;
+            display: inline-block;
+            font-size: 1.08em;
+            border: 1px solid #b3d1f7;
+        }
+        .highlight {
+            color: #0074D9;
+            font-weight: bold;
+        }
+        .desc {
+            color: #444;
+            margin-bottom: 4px;
+            font-size: 1.07em;
+            margin-bottom: 2px;
+            margin-top: 2px;
+        }
+        .desc .subtitle-vi {
+            color: #0074D9;
+            font-weight: 500;
+        }
+        .desc .subtitle-en {
+            color: #888;
+            font-style: italic;
+            font-size: 0.97em;
+        }
+        ul {
+            margin: 8px 0 8px 20px;
+            padding: 0;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 10px; }
+            .step { padding: 10px 6px 6px 6px; }
+            .matrix-input-table input[type="number"] { width: 38px; font-size: 0.97em; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Trực quan không gian Null và Image của ma trận</h2>
+    <div class="note">
+        <b>Hướng dẫn:</b> Chọn kích thước và nhập từng phần tử vào bảng bên dưới, hoặc tạo ma trận ngẫu nhiên.<br>
+        <b>Guide:</b> Choose matrix size and enter each element below, or generate a random matrix.
+    </div>
+    <div class="input-row">
+        <label>Kích thước ma trận:</label>
+        <input type="number" id="rows" min="2" max="8" value="3" style="width:48px;" onchange="renderMatrixInput()"> x
+        <input type="number" id="cols" min="2" max="8" value="3" style="width:48px;" onchange="renderMatrixInput()">
+    </div>
+    <div class="btn-group">
+        <button class="btn-secondary" onclick="generateRandomMatrix()">Tạo ngẫu nhiên<br><span style='font-size:0.9em'>Random</span></button>
+        <button class="btn-secondary" onclick="clearMatrix()">Xóa<br><span style='font-size:0.9em'>Clear</span></button>
+        <button class="btn-main" onclick="processMatrix()">Tính toán<br><span style='font-size:0.9em'>Compute</span></button>
+    </div>
+    <div class="input-row" id="matrixInputArea"></div>
+    <div id="output"></div>
+</div>
+<script>
+function parseMatrix(input) {
+    return input.trim().split('\n').map(row =>
+        row.trim().split(/[\s,]+/).map(Number)
+    );
+}
+function cloneMatrix(A) {
+    return A.map(row => row.slice());
+}
+
+// Hàm tìm ước chung lớn nhất
+function gcd(a, b) {
+    if (!b) return Math.abs(a);
+    return gcd(b, a % b);
+}
+
+// Chuyển số thực sang phân số tối giản (không hỗn số)
+function toFraction(x, tol = 1e-10) {
+    if (Number.isInteger(x)) return x.toString();
+    let sign = x < 0 ? -1 : 1;
+    x = Math.abs(x);
+    let h1=1, h2=0, k1=0, k2=1, b = x;
+    do {
+        let a = Math.floor(b);
+        let aux = h1; h1 = a*h1 + h2; h2 = aux;
+        aux = k1; k1 = a*k1 + k2; k2 = aux;
+        b = 1/(b - a);
+    } while (Math.abs(x - h1/k1) > tol && k1 <= 10000);
+    let num = sign * h1, den = k1;
+    let d = gcd(num, den);
+    num /= d; den /= d;
+    if (den === 1) return num.toString();
+    return `${num}/${den}`;
+}
+
+// Hiển thị ma trận với phân số và phụ đề tiếng Việt
+function matrixToHTML(A, pivots=[]) {
+    let html = '<table class="matrix">';
+    for (let i = 0; i < A.length; ++i) {
+        html += '<tr>';
+        for (let j = 0; j < A[0].length; ++j) {
+            let cls = pivots.includes(j) ? 'pivot' : '';
+            html += `<td class="${cls}">${toFraction(A[i][j])}</td>`;
+        }
+        html += '</tr>';
+    }
+    html += '</table>';
+    return html;
+}
+
+// Hiển thị vector với phân số
+function vectorToHTML(v) {
+    return '<span class="vector">[' + v.map(toFraction).join(', ') + ']</span>';
+}
+
+function spanToHTML(vectors) {
+    if (vectors.length === 0) return '{0}';
+    return 'span{ ' + vectors.map(vectorToHTML).join(', ') + ' }';
+}
+function gaussianElimination(A) {
+    let m = A.length, n = A[0].length;
+    let M = cloneMatrix(A);
+    let steps = [];
+    let pivots = [];
+    let row = 0;
+    for (let col = 0; col < n && row < m; ++col) {
+        // Find pivot
+        let maxRow = row;
+        for (let i = row + 1; i < m; ++i)
+            if (Math.abs(M[i][col]) > Math.abs(M[maxRow][col]))
+                maxRow = i;
+        if (Math.abs(M[maxRow][col]) < 1e-10) continue; // skip zero column
+        // Swap
+        if (maxRow !== row) {
+            [M[row], M[maxRow]] = [M[maxRow], M[row]];
+            steps.push({desc: `Swap row ${row+1} with row ${maxRow+1}`, matrix: cloneMatrix(M)});
+        }
+        // Normalize pivot row
+        let pivot = M[row][col];
+        for (let j = col; j < n; ++j) M[row][j] /= pivot;
+        steps.push({desc: `Normalize row ${row+1} (make pivot 1)`, matrix: cloneMatrix(M)});
+        // Eliminate below
+        for (let i = row + 1; i < m; ++i) {
+            let factor = M[i][col];
+            for (let j = col; j < n; ++j)
+                M[i][j] -= factor * M[row][j];
+        }
+        steps.push({desc: `Eliminate below pivot in column ${col+1}`, matrix: cloneMatrix(M)});
+        pivots.push(col);
+        row++;
+    }
+    return {ref: M, steps, pivots};
+}
+
+// Get basis for Im(A) from pivot columns
+function getImageBasis(A, pivots) {
+    return pivots.map(j => A.map(row => row[j]));
+}
+
+// Solve homogeneous system (REF) for null space basis
+function getNullSpaceBasis(ref, pivots) {
+    let m = ref.length, n = ref[0].length;
+    let freeVars = [];
+    for (let j = 0; j < n; ++j)
+        if (!pivots.includes(j)) freeVars.push(j);
+    let basis = [];
+    for (let idx = 0; idx < freeVars.length; ++idx) {
+        let v = Array(n).fill(0);
+        let free = freeVars[idx];
+        v[free] = 1;
+        // Back-substitute
+        for (let i = pivots.length - 1; i >= 0; --i) {
+            let row = i, col = pivots[i];
+            let sum = 0;
+            for (let j = col + 1; j < n; ++j)
+                sum += ref[row][j] * v[j];
+            v[col] = -sum;
+        }
+        basis.push(v);
+    }
+    return basis;
+}
+
+function renderMatrixInput(values) {
+    let rows = parseInt(document.getElementById('rows').value);
+    let cols = parseInt(document.getElementById('cols').value);
+    let area = document.getElementById('matrixInputArea');
+    let html = '<table class="matrix-input-table">';
+    for (let i = 0; i < rows; ++i) {
+        html += '<tr>';
+        for (let j = 0; j < cols; ++j) {
+            let val = (values && values[i] && values[i][j] !== undefined) ? values[i][j] : '';
+            html += `<td><input type="number" id="cell_${i}_${j}" value="${val}" step="any"></td>`;
+        }
+        html += '</tr>';
+    }
+    html += '</table>';
+    area.innerHTML = html;
+}
+
+// Lấy dữ liệu từ bảng input thành ma trận số
+function getMatrixFromInputs() {
+    let rows = parseInt(document.getElementById('rows').value);
+    let cols = parseInt(document.getElementById('cols').value);
+    let matrix = [];
+    for (let i = 0; i < rows; ++i) {
+        let row = [];
+        for (let j = 0; j < cols; ++j) {
+            let val = document.getElementById(`cell_${i}_${j}`).value;
+            if (val === "" || isNaN(Number(val))) return null;
+            row.push(Number(val));
+        }
+        matrix.push(row);
+    }
+    return matrix;
+}
+
+// Tạo ma trận ngẫu nhiên và điền vào bảng input
+function generateRandomMatrix() {
+    let rows = parseInt(document.getElementById('rows').value);
+    let cols = parseInt(document.getElementById('cols').value);
+    let values = [];
+    for (let i = 0; i < rows; ++i) {
+        let row = [];
+        for (let j = 0; j < cols; ++j) {
+            row.push(Math.floor(Math.random() * 11) - 5); // [-5,5]
+        }
+        values.push(row);
+    }
+    renderMatrixInput(values);
+}
+
+// Xóa bảng input
+function clearMatrix() {
+    renderMatrixInput();
+}
+
+// Khi nhấn "Tính toán", lấy dữ liệu từ bảng input
+function processMatrix() {
+    let A = getMatrixFromInputs();
+    let output = document.getElementById('output');
+    output.innerHTML = '';
+
+    if (!A || !A.length || !A[0].length || A.some(row => row.length !== A[0].length)) {
+        output.innerHTML = '<div class="step"><span class="highlight">Lỗi:</span> Ma trận không hợp lệ. Vui lòng kiểm tra lại dữ liệu nhập.</div>';
+        return;
+    }
+
+    // Bước 1: Khử Gauss
+    let {ref, steps, pivots} = gaussianElimination(A);
+    output.innerHTML += `<div class="step active">
+        <div class="step-title">Bước 1: Đưa ma trận về dạng bậc thang (Khử Gauss)</div>
+        <span style="color:#555"><i>Step 1: Transform matrix to row echelon form (Gaussian elimination)</i></span><br>
+        <ul>
+            <li>Đưa ma trận về dạng bậc thang bằng phép khử Gauss.</li>
+            <li>Chú ý các vị trí pivot (phần tử đầu tiên khác 0 trên mỗi hàng).</li>
+        </ul>
+        <ul>
+            <li><i>Transform the matrix to row echelon form using Gaussian elimination.</i></li>
+            <li><i>Note the pivot positions (the first nonzero entry in each row).</i></li>
+        </ul>
+    `;
+
+    // Gom các bước nhỏ theo từng pivot (step group)
+    let stepGroups = [];
+    let currentGroup = null;
+    steps.forEach((step, i) => {
+        let normMatch = step.desc.match(/^Normalize row (\d+) \(make pivot 1\)$/);
+        let elimMatch = step.desc.match(/^Eliminate below pivot in column (\d+)$/);
+        let swapMatch = step.desc.match(/^Swap row (\d+) with row (\d+)$/);
+
+        if (normMatch) {
+            // Bắt đầu một nhóm mới cho mỗi pivot
+            if (currentGroup) stepGroups.push(currentGroup);
+            currentGroup = {
+                pivotRow: parseInt(normMatch[1]),
+                steps: []
+            };
+        }
+        if (!currentGroup) currentGroup = {pivotRow: null, steps: []};
+        currentGroup.steps.push({step, normMatch, elimMatch, swapMatch});
+    });
+    if (currentGroup) stepGroups.push(currentGroup);
+
+    // Hiển thị từng nhóm bước nhỏ
+    stepGroups.forEach((group, idx) => {
+        if (group.pivotRow !== null) {
+            output.innerHTML += `<div class="step-sub">Xử lý pivot ở hàng ${group.pivotRow}</div>
+            <div class="step-sub-en">Process pivot in row ${group.pivotRow}</div>`;
+        }
+        group.steps.forEach(({step, normMatch, elimMatch, swapMatch}, i) => {
+            let subtitleVi = '', subtitleEn = '';
+            if (normMatch) {
+                subtitleVi = `Chuẩn hóa hàng ${normMatch[1]} (lấy pivot 1)`;
+                subtitleEn = `Normalize row ${normMatch[1]} (make pivot 1)`;
+            }
+            if (elimMatch) {
+                subtitleVi = `Khử dưới pivot ở cột ${elimMatch[1]}`;
+                subtitleEn = `Eliminate below pivot in column ${elimMatch[1]}`;
+            }
+            if (swapMatch) {
+                subtitleVi = `Hoán vị hàng ${swapMatch[1]} với hàng ${swapMatch[2]}`;
+                subtitleEn = `Swap row ${swapMatch[1]} with row ${swapMatch[2]}`;
+            }
+            output.innerHTML += `<div class="desc" style="margin-top:8px;">
+                ${step.desc}<br>
+                <span class="subtitle-vi">${subtitleVi}</span><br>
+                <span class="subtitle-en">${subtitleEn}</span>
+            </div>${matrixToHTML(step.matrix, pivots)}`;
+        });
+    });
+
+    output.innerHTML += `<div class="desc" style="margin-top:14px;">
+        <b>Kết quả dạng bậc thang:</b><br>
+        <span class="subtitle-en">Row echelon form result</span>
+    </div>${matrixToHTML(ref, pivots)}</div>`;
+
+    // Bước 2: Không gian ảnh
+    output.innerHTML += `<div class="step">
+        <div class="step-title">Bước 2: Không gian ảnh (Im(A))</div>
+        <span class="subtitle-en">Step 2: Image space (Im(A))</span><br>
+        <ul>
+            <li>Các cột chứa pivot trong ma trận bậc thang là các véc tơ độc lập tuyến tính tạo thành cơ sở cho Im(A).</li>
+        </ul>
+        <ul>
+            <li><i>The columns with pivots in the row echelon matrix form a basis for Im(A).</i></li>
+        </ul>
+        Các cột chứa pivot là: <span class="highlight">${pivots.map(i=>i+1).join(', ')}</span><br>
+        <span class="subtitle-en">Pivot columns: ${pivots.map(i=>i+1).join(', ')}</span><br>
+        Im(A) = ${spanToHTML(getImageBasis(A, pivots))}<br>
+        <span class="subtitle-en">Im(A) = ${spanToHTML(getImageBasis(A, pivots))}</span>
+    </div>`;
+
+    // Bước 3: Không gian nghiệm
+    let nullBasis = getNullSpaceBasis(ref, pivots);
+    output.innerHTML += `<div class="step">
+        <div class="step-title">Bước 3: Không gian nghiệm (Null(A))</div>
+        <span class="subtitle-en">Step 3: Null space (Null(A))</span><br>
+        <ul>
+            <li>Giải hệ phương trình tuyến tính thuần nhất tương ứng với ma trận bậc thang.</li>
+            <li>Các biến tự do là tham số, các nghiệm khác được biểu diễn qua các biến tự do.</li>
+            <li>Không gian nghiệm là span của các véc tơ tương ứng với các biến tự do.</li>
+        </ul>
+        <ul>
+            <li><i>Solve the homogeneous linear system corresponding to the row echelon matrix.</i></li>
+            <li><i>Free variables are parameters; other variables are expressed in terms of them.</i></li>
+            <li><i>The null space is the span of the vectors corresponding to the free variables.</i></li>
+        </ul>
+    `;
+    if (nullBasis.length === 0) {
+        output.innerHTML += `Hệ chỉ có nghiệm không: Null(A) = {0}<br>
+        <span class="subtitle-en">Only the trivial solution: Null(A) = {0}</span>`;
+    } else {
+        output.innerHTML += `Các biến tự do: <span class="highlight">${nullBasis.map((v,i)=>'x'+(v.findIndex(x=>x===1)+1)).join(', ')}</span><br>
+        <span class="subtitle-en">Free variables: ${nullBasis.map((v,i)=>'x'+(v.findIndex(x=>x===1)+1)).join(', ')}</span><br>
+        Null(A) = ${spanToHTML(nullBasis)}<br>
+        <span class="subtitle-en">Null(A) = ${spanToHTML(nullBasis)}</span>`;
+    }
+    output.innerHTML += `</div>`;
+}
+
+// Khởi tạo bảng input khi tải trang
+window.onload = function() { renderMatrixInput(); };
+</script>
+</body>
+</html>
